@@ -18,7 +18,7 @@ public class EchoClient {
 		InputStream socketInputStream = socket.getInputStream();
 		OutputStream socketOutputStream = socket.getOutputStream();
 
-		Runnable input = () -> {
+		Thread inputThread = new Thread(() -> {
 			try{
 				int read;
 				while ((read = System.in.read()) != -1) {
@@ -33,9 +33,11 @@ public class EchoClient {
 			}
 			
 			
-		};
+		});
 
-		Runnable output = () -> {
+		inputThread.start();
+
+		Thread outputThread = new Thread(() -> {
 			try{
 				int read;
 				while ((read = socketInputStream.read()) != -1) {
@@ -48,12 +50,8 @@ public class EchoClient {
 			} catch(IOException e) {
 				e.printStackTrace();
 			}
-		};
+		});
 
-		Thread inputThread = new Thread(input);
-		inputThread.start();
-
-		Thread outputThread = new Thread(output);
 		outputThread.start();
 
 	}
