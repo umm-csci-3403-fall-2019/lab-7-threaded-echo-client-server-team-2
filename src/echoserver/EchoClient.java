@@ -18,6 +18,43 @@ public class EchoClient {
 		InputStream socketInputStream = socket.getInputStream();
 		OutputStream socketOutputStream = socket.getOutputStream();
 
-		// Put your code here.
+		Runnable input = () -> {
+			try{
+				int read;
+				while ((read = System.in.read()) != -1) {
+					socketOutputStream.write(read); // Write the input from the stdin to output stream (the server)
+				} 
+
+				// Shutdown the socket
+				socket.shutdownOutput();
+
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+			
+			
+		};
+
+		Runnable output = () -> {
+			try{
+				int read;
+				while ((read = socketInputStream.read()) != -1) {
+					System.out.write(read); // Output to stdout the input coming from the server
+				} 
+
+				System.out.flush(); // Flush the stdout stream
+				
+				socket.close();
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+		};
+
+		Thread inputThread = new Thread(input);
+		inputThread.start();
+
+		Thread outputThread = new Thread(output);
+		outputThread.start();
+
 	}
 }
